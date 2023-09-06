@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="#1B1D2C">
+    android:background="@color/night_black">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -90,34 +90,34 @@
             android:id="@+id/btnPrevious"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="#1B1D2C"
+            android:backgroundTint="@color/night_black"
             android:src="@drawable/baseline_skip_previous_24" />
 
         <ImageButton
             android:id="@+id/btnReplay"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:backgroundTint="#1B1D2C"
+            android:backgroundTint="@color/night_black"
             android:src="@drawable/baseline_replay_10_24" />
 
         <ImageButton
             android:id="@+id/btnPlayPause"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:backgroundTint="#1B1D2C"
+            android:backgroundTint="@color/night_black"
             android:src="@drawable/baseline_pause_24" />
         <ImageButton
             android:id="@+id/btnForward"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:backgroundTint="#1B1D2C"
+            android:backgroundTint="@color/night_black"
             android:src="@drawable/baseline_forward_10_24" />
 
         <ImageButton
             android:id="@+id/btnNext"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:backgroundTint="#1B1D2C"
+            android:backgroundTint="@color/night_black"
             android:src="@drawable/baseline_skip_next_24" />
 
 

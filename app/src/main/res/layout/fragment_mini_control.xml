@@ -7,7 +7,7 @@
     tools:context=".MiniControlFragment"
     android:padding="10dp"
     android:layout_marginBottom="10dp"
-    android:background="#1B1D2C">
+    android:background="@color/night_black">
 
     <TextView
         android:id="@+id/songTitleFragment"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_play_arrow_24"
-        android:background="#1B1D2C"
+        android:background="@color/night_black"
         app:layout_constraintBottom_toBottomOf="@+id/fragmentArtist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/songTitleFragment" />

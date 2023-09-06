@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="50dp"
+    android:paddingEnd="50dp"
+    android:background="@color/night_black">
+
+    <ImageView
+        android:layout_centerHorizontal="true"
+        android:id="@+id/imageViewLogo"
+        android:layout_width="500px"
+        android:layout_height="200px"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="145dp"
+        android:src="@drawable/logo" />
+
+
+    <LinearLayout
+        android:id="@+id/Email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageViewLogo"
+        android:layout_marginTop="67dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:layout_marginTop="10dp"
+            android:src="@android:drawable/ic_dialog_email"
+            android:layout_marginEnd="20dp"/>
+
+        <EditText
+            android:id="@+id/editTextEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:backgroundTint="@color/white"
+            android:inputType="textEmailAddress"
+            android:padding="12dp"
+            android:textColor="@color/white" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/Password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Email"
+        android:layout_marginTop="50px"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:src="@android:drawable/ic_lock_idle_lock"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"/>
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:backgroundTint="@color/white"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/Password"
+        android:layout_marginTop="68dp"
+        android:text="Login"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/textViewRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Don't Have an Account? Register"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

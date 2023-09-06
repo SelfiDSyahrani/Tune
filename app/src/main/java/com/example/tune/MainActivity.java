@@ -16,11 +16,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.tune.Event.SongUpdateEvent;
 import com.example.tune.adapter.MyAdapter;
-import com.example.tune.model.Item;
-
-import org.greenrobot.eventbus.Subscribe;
+import com.example.tune.model.songlist.Song;
+import com.example.tune.model.songlist.SongListApiService;
+import com.example.tune.model.songlist.SongResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,18 +31,22 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-    List<Item> items = new ArrayList<Item>();
-    Item clickedItem;
+//    List<Item> items = new ArrayList<Item>();
+
+    List<Song> songs = new ArrayList<Song>();
+    Song clickedItem;
     MyAdapter adapter;
     RecyclerView recyclerView;
-    private MockApi mockApi;
-    SharedPreferences sharedPreferences;
+    private SongListApiService songApi;
+
+    SharedPreferences sharedPreferences, spIsLoggedIn;
     private static String SHARED_PREFERENCES_NAME = "myPreference";
     private static final String KEY_SONG_TITLE = "SongTitle";
     public static final String KEY_ARTIST = "Artist";
     private static final int LOADING_VIEW = 1;
     private static final int RECYCLER_VIEW = 2;
     private int currentView = LOADING_VIEW;
+    String accessToken, refreshToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +54,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         showLoadingView();
 
+        sharedPreferences = getSharedPreferences("MyTokenPrefs", Context.MODE_PRIVATE);
+        accessToken = sharedPreferences.getString("access_token", "");
+        refreshToken = sharedPreferences.getString("refresh_token", "");
+
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://6152fa45c465200017d1a8e3.mockapi.io/api/v1/")
+                .baseUrl("https://473d-103-209-187-142.ngrok.io/tune/api/v1/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        mockApi = retrofit.create(MockApi.class);
+        songApi = retrofit.create(SongListApiService.class);
 
         getItems();
     }
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recycleview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyAdapter(getApplicationContext(), items);
+        adapter = new MyAdapter(getApplicationContext(), songs);
         recyclerView.setAdapter(adapter);
         adapter.setOnItemClickListener(this::onItemClick);
         currentView = RECYCLER_VIEW;
@@ -77,17 +84,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getItems() {
-        Call<List<Item>> call = mockApi.getItem();
+        Call<SongResponse> call = songApi.getSongList("Bearer " + accessToken);
+        call.enqueue(new Callback<SongResponse>(){
 
-        call.enqueue(new Callback<List<Item>>() {
             @Override
-            public void onResponse(Call<List<Item>> call, Response<List<Item>> response) {
+            public void onResponse(Call<SongResponse> call, Response<SongResponse> response) {
                 if(!response.isSuccessful()){
                     Toast.makeText(MainActivity.this, "Failed to load data", Toast.LENGTH_SHORT).show();
-                    return;
                 }
-                items.clear();
-                items.addAll(response.body());
+                songs.clear();
+                SongResponse songResponse = response.body();
+                if (songResponse != null) {
+                    songs.addAll(songResponse.getSongs());
+                }
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }
@@ -98,14 +107,13 @@ public class MainActivity extends AppCompatActivity {
                 if(foregroundIsRunning()){
                     showFragment(new MiniControlFragment());
                 }
-            }
 
+            }
             @Override
-            public void onFailure(Call<List<Item>> call, Throwable t) {
+            public void onFailure(Call<SongResponse> call, Throwable t) {
                 Toast.makeText(MainActivity.this, "Network error, please make sure your connection is stable", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override
@@ -122,13 +130,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onItemClick(int position) {
-        clickedItem = items.get(position);
-
+        clickedItem = songs.get(position);
+        Log.d("SONG", "onItemClick: " + clickedItem.getArtist());
         Intent intent = new Intent(MainActivity.this, MediaPlayerService.class);
-        intent.putExtra("SONG_LIST", new ArrayList<>(items));
+        intent.putExtra("SONG_LIST", new ArrayList<>(songs));
         intent.putExtra("CURRENT_SONG_INDEX", position);
         Intent intentActivity = new Intent(MainActivity.this, SongDetailScreenActivity.class);
-        intent.putExtra("SONG_LIST", new ArrayList<>(items));
+        intent.putExtra("SONG_LIST", new ArrayList<>(songs));
         intent.putExtra("CURRENT_SONG_INDEX", position);
 
         startActivity(intentActivity);
@@ -150,4 +158,17 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    private void logoutUser() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyTokenPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("access_token");
+        editor.remove("refresh_token");
+        editor.apply();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
 }

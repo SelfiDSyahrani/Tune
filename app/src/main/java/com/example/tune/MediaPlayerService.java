@@ -25,7 +25,7 @@ import com.example.tune.Event.PrevEvent;
 import com.example.tune.Event.ReplayEvent;
 import com.example.tune.Event.SeekBarPositionEvent;
 import com.example.tune.Event.SongUpdateEvent;
-import com.example.tune.model.Item;
+import com.example.tune.model.songlist.Song;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,7 +38,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private static final String CHANNEL_ID = "ForegroundServiceChannel";
     private static final int NOTIFICATION_ID = 1;
     private static MediaPlayer mediaPlayer;
-    private static List<Item> songList;
+    private static List<Song> songList;
     private static int currentSongIndex;
     private boolean isPrepared = false;
 
@@ -57,9 +57,10 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            List<Item> items = (List<Item>) intent.getSerializableExtra("SONG_LIST");
-            if (items != null) {
-                songList = new ArrayList<>(items);
+            List<Song> songs = (List<Song>) intent.getSerializableExtra("SONG_LIST");
+
+            if (songs != null) {
+                songList = new ArrayList<>(songs);
                 currentSongIndex = intent.getIntExtra("CURRENT_SONG_INDEX", 0);
                 startForegroundService();
                 if (mediaPlayer == null) {
@@ -116,7 +117,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         public void run() {
             if (mediaPlayer != null) {
                 EventBus.getDefault().post(new SongUpdateEvent(
-                        getCurrentSong().getSongTitle(),
+                        getCurrentSong().getTitle(),
                         getCurrentSong().getArtist(),
                         mediaPlayer.isPlaying(),
                         mediaPlayer.getDuration(),
@@ -133,7 +134,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
             } else {
                 mediaPlayer.reset(); // Reset MediaPlayer untuk memulai pemutaran baru.
                 try {
-                    mediaPlayer.setDataSource(songList.get(currentSongIndex).getSong());
+                    mediaPlayer.setDataSource(songList.get(currentSongIndex).getSongUrl());
                     mediaPlayer.prepareAsync(); // Asinkron persiapan pemutaran musik.
                     isPrepared = false;
                 } catch (IOException e) {
@@ -146,9 +147,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
     private void prepareMediaPlayer() {
         if (songList != null && currentSongIndex >= 0 && currentSongIndex < songList.size()) {
             try {
-                Item currentSong = songList.get(currentSongIndex);
+                Song currentSong = songList.get(currentSongIndex);
                 mediaPlayer.reset();
-                mediaPlayer.setDataSource(currentSong.getSong());
+                mediaPlayer.setDataSource(currentSong.getSongUrl());
                 mediaPlayer.prepareAsync();
                 isPrepared = false;
             } catch (IOException e) {
@@ -170,7 +171,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         return mediaPlayer != null && mediaPlayer.isPlaying();
     }
 
-    public Item getCurrentSong() {
+    public Song getCurrentSong() {
         if (songList != null && currentSongIndex >= 0 && currentSongIndex < songList.size()) {
             return songList.get(currentSongIndex);
         }
@@ -231,7 +232,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnPrepare
         createNotificationChannel();
         startForeground(NOTIFICATION_ID,
                 notification(
-                        getCurrentSong().getSongTitle(),
+                        getCurrentSong().getTitle(),
                         getCurrentSong().getArtist(),
                         getDuration(), getCurrentPosition()));
     }

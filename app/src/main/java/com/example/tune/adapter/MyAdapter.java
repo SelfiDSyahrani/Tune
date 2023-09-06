@@ -1,6 +1,7 @@
 package com.example.tune.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.tune.R;
-import com.example.tune.model.Item;
+import com.example.tune.model.songlist.Song;
 
 import java.util.List;
 
@@ -18,12 +18,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
 
     Context context;
-    List<Item> items;
+//    List<Item> items;
+    List<Song> songs;
     private OnItemClickListener onItemClickListener;
 
-    public MyAdapter(Context context, List<Item> items) {
+    public MyAdapter(Context context, List<Song> songs) {
         this.context = context;
-        this.items = items;
+        this.songs = songs;
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -39,12 +40,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.songTitle.setText(items.get(position).getSongTitle());
-        holder.artist.setText(items.get(position).getArtist());
+        holder.songTitle.setText(songs.get(position).getTitle());
+        holder.artist.setText(songs.get(position).getArtist());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int clickedPosition = holder.getAdapterPosition();
+                Log.d("TAG", "onClick: " + clickedPosition);
                 if(onItemClickListener != null && clickedPosition != RecyclerView.NO_POSITION){
                     onItemClickListener.onItemClick(clickedPosition);
                 }
@@ -54,7 +56,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return songs.size();
     }
 
 
